@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rock · Paper · Scissors — You vs The Computer</title>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   🎨 THEME PANEL — mess with these first.
+   change ONE value, save, refresh (Ctrl+R). the whole page updates.
+   you can't break anything that Ctrl+Z can't fix. go for it.
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --accent: #3a6ea5;   /* ⭐ Open Dreams blue — the main one. try: #fdb913 #2a9d8f #e63946 #7b2cbf */
+  --gold:   #fdb913;   /* the little underline + highlights. try: #ffd166 */
+  --bg:     #fdfdfb;   /* page background. try: #fff8e7 (warm) or #f0f4f8 (cool) */
+  --ink:    #22344a;   /* text colour. try: #000000 or #1d3557 */
+  --radius: 12px;      /* corners. 0px = sharp, 24px = bubbly */
+}
+
+/* ── all the styling below is done for you. peek if you're curious ── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Trebuchet MS", Verdana, sans-serif;
+  background: #fdfdfb;               /* plain fallback for older browsers */
+  background: var(--bg);
+  color: #22344a;
+  color: var(--ink);
+  min-height: 100vh;
+  text-align: center;
+  padding: 40px 16px 60px;
+}
+h1 {
+  font-size: 2.2em;
+  letter-spacing: 1px;
+  cursor: pointer;                   /* 🔒 there's a secret hiding at the bottom of the code */
+}
+h1 span { color: #3a6ea5; color: var(--accent); }
+.tagline { opacity: 0.7; margin-top: 6px; }
+.divider {
+  width: 56px;
+  height: 4px;
+  background: #fdb913;
+  background: var(--gold);
+  margin: 18px auto 0;
+  border-radius: 2px;
+}
+
+/* ── scoreboard ── */
+.scoreboard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 26px auto 10px;
+}
+.score-card {
+  background: #ffffff;
+  border: 2px solid #3a6ea5;
+  border-color: var(--accent);
+  border-radius: 12px;
+  border-radius: var(--radius);
+  padding: 12px 30px;
+  margin: 0 12px;
+  min-width: 130px;
+}
+.score-label { font-size: 0.8em; text-transform: uppercase; letter-spacing: 2px; opacity: 0.65; }
+.score-number { font-size: 2.4em; font-weight: bold; color: #3a6ea5; color: var(--accent); }
+.vs { font-weight: bold; opacity: 0.45; }
+
+/* ── messages ── */
+.message { font-size: 1.2em; min-height: 2em; margin: 20px auto 4px; max-width: 560px; }
+.choice-line { opacity: 0.65; min-height: 1.4em; margin-bottom: 22px; }
+
+/* ── the buttons ── */
+button.weapon {
+  font-family: inherit;
+  font-size: 1.05em;
+  color: #22344a;
+  color: var(--ink);
+  background: #ffffff;
+  border: 2px solid #3a6ea5;
+  border-color: var(--accent);
+  border-radius: 12px;
+  border-radius: var(--radius);
+  padding: 14px 26px 12px;
+  margin: 8px;
+  cursor: pointer;
+}
+button.weapon:hover { background: #3a6ea5; background: var(--accent); color: #ffffff; }
+button.weapon:active { transform: scale(0.96); }
+.weapon-emoji { display: block; font-size: 2.2em; margin-bottom: 6px; }
+
+footer { margin-top: 48px; opacity: 0.55; font-size: 0.85em; }
+</style>
+</head>
+<body>
+
+  <h1 id="game-title">Rock · Paper · <span>Scissors</span></h1>
+  <p class="tagline">You vs The Computer — first to 5 earns the bragging rights 💻</p>
+  <div class="divider"></div>
+
+  <div class="scoreboard">
+    <div class="score-card">
+      <div class="score-label">You</div>
+      <div class="score-number" id="player-score">0</div>
+    </div>
+    <div class="vs">VS</div>
+    <div class="score-card">
+      <div class="score-label">Computer</div>
+      <div class="score-number" id="computer-score">0</div>
+    </div>
+  </div>
+
+  <p class="message" id="message">💻 zzz… the computer is asleep. Your first clue is in MISSION 0, inside the &lt;script&gt; below.</p>
+  <p class="choice-line" id="choice-line">No rounds played yet.</p>
+
+  <div class="buttons">
+    <button class="weapon" id="rock-button"><span class="weapon-emoji">🪨</span>Rock</button>
+    <button class="weapon" id="paper-button"><span class="weapon-emoji">📄</span>Paper</button>
+    <button class="weapon" id="scissors-button"><span class="weapon-emoji">✂️</span>Scissors</button>
+  </div>
+
+  <!-- ✏️ EDIT: put your actual name in — you built this. -->
+  <footer>Built by [your name] · Summer Academy</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   🎯 MISSION 0 — WAKE THE COMPUTER (your first bug hunt)
+   ok so the page is broken. we did that on purpose.
+   this is literally what programmers do all day: something breaks,
+   you read the error, you fix it. no panicking required.
+     1. press F12 (or right-click → Inspect), open the "Console" tab
+     2. there's red text. it says what's wrong AND gives a line number
+     3. go to that line below. ONE letter is missing.
+        fix it, save, refresh — the computer wakes up on screen.
+   why this matters: the console straight up tells you what's broken.
+   people who read errors fix bugs way faster than people who stare.
+   ═══════════════════════════════════════════════════════════════ */
+
+// these grab pieces of the page so JavaScript can change them:
+const messageBox       = document.getElementById("message");
+const choiceLine       = document.getElementById("choice-line");
+const playerScoreBox   = document.getElementById("player-score");
+const computerScoreBox = document.getElementById("computer-score");
+
+// variables: little boxes that remember numbers between rounds.
+let playerScore   = 0;
+let computerScore = 0;
+
+// the computer says hi as soon as the page loads:
+messageBox.textContent = "💻 Computer online. Choose your weapon!";
+
+/* ═══════════════════════════════════════════════════════════════
+   🎯 MISSION 1 — MAKE THE BUTTONS LISTEN (click events)
+   right now a button is just a picture. it does nothing until
+   JavaScript listens for the click.
+   why: every app you use is just code reacting to clicks and taps.
+   ── WORKED EXAMPLE ── the Rock button is already wired up. read it:
+   ═══════════════════════════════════════════════════════════════ */
+document.getElementById("rock-button").addEventListener("click", function () {
+  playRound("rock");
+});
+document.getElementById("paper-button").addEventListener("click", function () {
+  playRound("paper");
+});
+document.getElementById("scissors-button").addEventListener("click", function () {
+  playRound("scissors");
+});
+
+
+// ✏️ your turn: do the same for "paper-button" and "scissors-button".
+// copy the 3 lines above, twice. change the id AND the word you pass
+// to playRound ("paper", then "scissors"). spelling has to be exact.
+// hint: until you do this, those buttons just do nothing. no crash.
+
+/* ═══════════════════════════════════════════════════════════════
+   🎯 MISSION 2 — GIVE THE COMPUTER A BRAIN (Math.random)
+   right now the computer ALWAYS picks rock. easy to beat. boring.
+   why: random = unpredictable, and unpredictable is what makes
+   this an actual game.
+   how Math.random works, in 3 steps:
+     Math.random()       → random decimal between 0 and 1 (like 0.734)
+     Math.random() * 3   → random decimal between 0 and 3 (like 2.202)
+     Math.floor( that )  → cuts the decimals off: 0, 1 or 2. a perfect index.
+   ✏️ your turn: swap the 0 below so the computer grabs options[0],
+   options[1] or options[2] at random.
+   ═══════════════════════════════════════════════════════════════ */
+function getComputerPick() {
+  const options = ["rock", "paper", "scissors"];
+  return options[Math.floor(2)];   // ✏️ EDIT this line — make the 0 random!
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   🎯 MISSION 3 — TEACH IT THE RULES (if / else if / else)
+   right now the computer thinks it wins basically everything.
+   try it: play paper against rock… and IT takes the point?? scam.
+   that's because only TWO situations are handled below — everything
+   else falls into the last "else", where the computer wins by default.
+   why: if/else is how code makes decisions. no ifs, no game.
+   ── WORKED EXAMPLES ── the tie, and "rock crushes scissors".
+   ✏️ your turn: add TWO more "else if" blocks in the marked gap:
+        • paper beats rock          • scissors beat paper
+   copy the worked block, change the two picks and the message.
+   ═══════════════════════════════════════════════════════════════ */
+function playRound(playerPick) {
+  const computerPick = getComputerPick();
+  choiceLine.textContent = "You chose " + playerPick + "  ·  Computer chose " + computerPick;
+
+  if (playerPick === computerPick) {
+    messageBox.textContent = "🤝 It's a tie! Great minds think alike.";
+  } else if (playerPick === "rock" && computerPick === "scissors") {
+    messageBox.textContent = "🎉 You win! Rock crushes scissors.";
+    playerScore = playerScore + 1;
+  }
+  else if (playerPick === "paper" && computerPick === "rock") {
+    messageBox.textContent = "🎉 You win! Paper beats rock.";
+    playerScore = playerScore + 1;
+  }
+  else if (playerPick === "scissors" && computerPick === "paper") {
+    messageBox.textContent = "🎉 You win! Scissors beat paper.";
+    playerScore = playerScore + 1;
+  }
+  // ✏️ 🎯 MISSION 3: your two new "else if" blocks go RIGHT HERE —
+  // between the } above and the "else" below. yes, exactly here.
+  else {
+    messageBox.textContent = "💻 Computer takes the point. Revenge next round?";
+    computerScore = computerScore + 1;
+    // ✏️ 🎯 MISSION 4 (part 1): the computer earned that point — add it
+    // to computerScore here. copy how playerScore does it a few lines up.
+  }
+
+  updateScoreboard();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   🎯 MISSION 4 — KEEP SCORE (variables that remember)
+   playerScore and computerScore (top of the script) keep their
+   values between rounds. that's the whole point of variables.
+   why: no memory = no rivalry. the score is what makes it a match.
+   ── WORKED EXAMPLE ── the player's half is already done:
+     • winning adds a point:  playerScore = playerScore + 1;  (up above)
+     • showing it on screen:  the first line inside updateScoreboard()
+   ✏️ your turn — two small steps:
+     part 1: in the "else" above, give the computer its point.
+     part 2: below, make computerScoreBox show computerScore.
+   until then the computer is stuck on 0. nice for you. also a lie.
+   ═══════════════════════════════════════════════════════════════ */
+function updateScoreboard() {
+  playerScoreBox.textContent = playerScore;
+  computerScoreBox.textContent = computerScore;
+  // ✏️ part 2 goes here (one line — copy the line above, change the names)
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🔒 SECRET — only if you finished everything else.
+// sneak peek of a future lesson: JavaScript can rewrite the CSS
+// while the page is running.
+// to unlock: delete the two comment-marker lines just below and at
+// the very bottom, save, refresh — then click the big title.
+// keep clicking. show whoever's sitting next to you. 😌
+// ═══════════════════════════════════════════════════════════════
+
+document.getElementById("game-title").addEventListener("click", function () {
+  const randomHue = Math.floor(Math.random() * 360);
+  document.documentElement.style.setProperty("--accent", "hsl(" + randomHue + ", 70%, 42%)");
+});
+
+</script>
+</body>
+</html>
